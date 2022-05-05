@@ -201,7 +201,9 @@ select {
 		position: absolute !important;
 		background: rgba(0,0,0,.2) !important;
 	}
-	
+	.footer-copyright{
+		display: none;
+	}
 	#qr-reader a {
 		color: #fff;
 	}
