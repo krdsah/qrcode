@@ -1,6 +1,6 @@
 # HTML5 QRCodes
-Repository ini diperuntukan memudahkan dalam hal login kedalan hotspot mikrotik.
-Selain fitur yang dimiliki lengkap, juga sangat mudah digunakan 
+Repository ini diperuntukan memudahkan dalam hal login hotspot mikrotik.
+Selain fitur yang dimiliki lengkap, juga sangat mudah digunakan.
 ## Cara Pemakaian :
 1. Tambahkan button di login.html
 ```
