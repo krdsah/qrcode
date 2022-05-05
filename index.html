@@ -3,77 +3,163 @@
  <head>
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title> Mikrotik QRCode Scanner &mdash; krdsah.eu.org</title>
+		<meta name="description" content="QR Code Scanner untuk login mikrotik">
+		<meta name="keywords" content="QR Code Scanner, Html5 Qr Code">
+
 		<meta name="theme-color" content="#9831e0">
 		<meta name="msapplication-navbutton-color" content="#9831e0">
 		<meta name="apple-mobile-web-app-status-bar-style" content="#9831e0">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<link rel="icon" href="img/favicon.ico">
-<style>
-body {
-max-width: 100%;
-margin: auto;
-padding: 20% 0 
-}
-
-#qr-reader {
-	border-radius: .75rem;
-	background: #fff;
-	padding: 1rem;
-	border:0 !important;
-	box-shadow: 0 0 15px rgba(25,25,25,.1);
-}
-#qr-reader a{
-	margin: 8px 0 !important;
-	color: #35aadc;
-	text-decoration: none !important;
-}
-input[type=file]{
-	width: 90%;
-	
-}
-input[type=file]::file-selector-button {
-  border: 2px solid #6c5ce7;
-  padding: .2em .4em;
-  border-radius: .2em;
-  background-color: #a29bfe;
-  transition: 1s;
-}
-
-input[type=file]::file-selector-button:hover {
-  background-color: #81ecec;
-  border: 2px solid #00cec9;
-}
-#qr-reader img {
-	width: 160px !important;
-}
-#qr-reader img[alt=Info] {
-	width: 20px !important;
-}
-#qr-reader select{
-	width: 90%;
-	margin: auto;
-	text-align: center;
-}
-#qr-reader button {
-	margin: 8px 0;
-	border-radius: 50px;
-	border:0;
-	padding: 8px 20px;
-	background: #8e44ad;
-	color: #fff;
-	text-transform: uppercase;
-}
-</style>
-<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/style-qr.css">
 <body>
+<canvas id="canvas"></canvas>
+<div class="wrapper">
+	
+<div class="header-nav">
+<div class="left">
+<h1 class="title">QRCode Scanner</h1>
+</div>
+<div class="right">
+<ul class="nav">
+<li>
+	<a href="./"> Home </a>
+</li>
+<li>
+	<a href="https://krdsah.eu.org"> About </a>
+</li>
+</ul>
+</div>
+</div>
+	
+		<div id="qr-reader"></div>
+	
 
-<div id="qr-reader" style="width:300px; margin: auto"></div>
+<div class="footer-copyright">
+<p>	Dibuat oleh <a href="https://krdsah.eu.org/"> KRDSAH</a> dengan <a href="https://github.com/mebjas/html5-qrcode" rel="nofollow noopener noreferer">HTML5 QRCode</a>
+</p>
+</div>
+</div>
 <script src="js/html5-qrcode.min.js"></script>
 <script>
+function validURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+
+function onScanSuccess(qrCodeMessage) {
+  if (validURL(qrCodeMessage)) {
+    window.location.href = qrCodeMessage;
+  }
+}
+
 var html5QrcodeScanner = new Html5QrcodeScanner(
-	"qr-reader", { fps: 60, qrbox: 100 });
-html5QrcodeScanner.render()
+	"qr-reader", { fps: 60, qrbox: 250 });
+html5QrcodeScanner.render(onScanSuccess);
+</script>
+<script>
+let c = init("canvas"),
+  w = (canvas.width = window.innerWidth),
+  h = (canvas.height = window.innerHeight);
+//initiation
+
+class firefly{
+  constructor(){
+    this.x = Math.random()*w;
+    this.y = Math.random()*h;
+    this.s = Math.random()*2;
+    this.ang = Math.random()*2*Math.PI;
+    this.v = this.s*this.s/4;
+  }
+  move(){
+    this.x += this.v*Math.cos(this.ang);
+    this.y += this.v*Math.sin(this.ang);
+    this.ang += Math.random()*20*Math.PI/180-10*Math.PI/180;
+  }
+  show(){
+    c.beginPath();
+    c.arc(this.x,this.y,this.s,0,2*Math.PI);
+    c.fillStyle="#fddba3";
+    c.fill();
+  }
+}
+
+let f = [];
+
+function draw() {
+  if(f.length < 100){
+    for(let j = 0; j < 10; j++){
+     f.push(new firefly());
+  }
+     }
+  //animation
+  for(let i = 0; i < f.length; i++){
+    f[i].move();
+    f[i].show();
+    if(f[i].x < 0 || f[i].x > w || f[i].y < 0 || f[i].y > h){
+       f.splice(i,1);
+       }
+  }
+}
+
+let mouse = {};
+let last_mouse = {};
+
+canvas.addEventListener(
+  "mousemove",
+  function(e) {
+    last_mouse.x = mouse.x;
+    last_mouse.y = mouse.y;
+
+    mouse.x = e.pageX - this.offsetLeft;
+    mouse.y = e.pageY - this.offsetTop;
+  },
+  false
+);
+function init(elemid) {
+  let canvas = document.getElementById(elemid),
+    c = canvas.getContext("2d"),
+    w = (canvas.width = window.innerWidth),
+    h = (canvas.height = window.innerHeight);
+  c.fillStyle = "rgba(250,30,30,1)";
+  c.fillRect(0, 0, w, h);
+  return c;
+}
+
+window.requestAnimFrame = (function() {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback);
+    }
+  );
+});
+
+function loop() {
+  window.requestAnimFrame(loop);
+  c.clearRect(0, 0, w, h);
+  draw();
+}
+
+window.addEventListener("resize", function() {
+  (w = canvas.width = window.innerWidth),
+  (h = canvas.height = window.innerHeight);
+  loop();
+});
+
+loop();
+setInterval(loop, 1000 / 60);
 </script>
 </body>
 </html>
